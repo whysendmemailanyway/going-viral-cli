@@ -1,7 +1,6 @@
-//import {API_ENDPOINT} from '../config';
-const {API_ENDPOINT} = require('../config');
+const {SERVER_ENDPOINT} = require('../config');
 
-const socket = require('socket.io-client')(API_ENDPOINT);
+const socket = require('socket.io-client')(SERVER_ENDPOINT);
 
 let listeners = {};
 

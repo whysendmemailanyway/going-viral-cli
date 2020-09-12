@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 // import io from 'socket.io-client';
 // import streamer from 'socket.io-stream';
-// import {API_ENDPOINT} from '../config';
 import {Link} from 'react-router-dom';
 import RTCService from '../services/rtc-service';
 
@@ -12,24 +11,36 @@ class GamePage extends Component {
     }
 
     componentDidMount = () => {
-        RTCService.createCall((peerConnection) => {
-            navigator.mediaDevices.getUserMedia({audio: true})
-            .then((userStream) => {
-                console.log(userStream);
-                const remoteStream = MediaStream();
-                peerConnection.addEventListener('track', (event) => {
-                    remoteStream.addTrack(event.track, remoteStream);
+        // fetch(`${API_ENDPOINT}/debug/get-ice-configuration`)
+        // .then((response) => {
+        //     if (response.ok) {
+        //         return response.json();
+        //     }
+        // })
+        // .then(data => {
+            RTCService.createCall((peerConnection) => {
+                console.log("Created call!");
+                navigator.mediaDevices.getUserMedia({audio: true})
+                .then((userStream) => {
+                    console.log(userStream);
+                    const remoteStream = MediaStream();
+                    peerConnection.addEventListener('track', (event) => {
+                        remoteStream.addTrack(event.track, remoteStream);
+                    });
+                    this.audio.srcObject = remoteStream;
+                    userStream.getTracks().forEach(track => {
+                        peerConnection.addTrack(track, userStream);
+                    });
+                })
+                .catch((err) => {
+                    console.error(err);
+                    this.props.history.push('/notgame');
                 });
-                this.audio.srcObject = remoteStream;
-                userStream.getTracks().forEach(track => {
-                    peerConnection.addTrack(track, userStream);
-                });
-            })
-            .catch((err) => {
-                console.error(err);
-                this.props.history.push('/notgame');
             });
-        })
+            // RTCService.joinCall((peerConnection2) => {
+            //     this.audio.srcObject = peerConnection2.getTracks()[0];
+            // });
+        // });
         // this.socket = io.connect(API_ENDPOINT);
         // navigator.mediaDevices.getUserMedia({audio: true})
         // .then((userStream) => {
